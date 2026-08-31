@@ -6,14 +6,18 @@ namespace IsometricTestAI.Rendering;
 
 public partial class TerrainRenderer : Node3D
 {
-    private readonly Dictionary<TerrainType, Material> _materials = new();
+    private readonly Dictionary<TerrainType, Material> _sideMaterials = new();
+    private readonly Dictionary<TerrainType, Material> _topMaterials = new();
 
     public void Build(TacticalMap map)
     {
         Name = "Terrain";
-        _materials[TerrainType.Grass] = FlatMaterial(new Color("668f50"));
-        _materials[TerrainType.Dirt] = FlatMaterial(new Color("a87748"));
-        _materials[TerrainType.Rock] = FlatMaterial(new Color("707a86"));
+        _sideMaterials[TerrainType.Grass] = FlatMaterial(new Color("3f5934"));
+        _sideMaterials[TerrainType.Dirt] = FlatMaterial(new Color("76502f"));
+        _sideMaterials[TerrainType.Rock] = FlatMaterial(new Color("4a5550"));
+
+        foreach (TerrainType terrain in System.Enum.GetValues(typeof(TerrainType)))
+            _topMaterials[terrain] = TexturedTopMaterial(PrototypeTextures.LoadTerrainTop(terrain));
 
         for (var x = 0; x < TacticalMap.Width; x++)
         for (var y = 0; y < TacticalMap.Height; y++)
@@ -40,7 +44,15 @@ public partial class TerrainRenderer : Node3D
         {
             Name = "Mesh",
             Mesh = new BoxMesh { Size = size },
-            MaterialOverride = _materials[cell.Terrain]
+            MaterialOverride = _sideMaterials[cell.Terrain]
+        });
+        body.AddChild(new MeshInstance3D
+        {
+            Name = "TexturedTop",
+            Mesh = new PlaneMesh { Size = new Vector2(0.92f, 0.92f) },
+            MaterialOverride = _topMaterials[cell.Terrain],
+            Position = new Vector3(0, height * 0.5f + 0.003f, 0),
+            RotationDegrees = new Vector3(0, ((cell.Position.X * 37 + cell.Position.Y * 17) % 4) * 90, 0)
         });
         body.AddChild(new CollisionShape3D
         {
@@ -53,6 +65,14 @@ public partial class TerrainRenderer : Node3D
     {
         ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
         AlbedoColor = color,
+        Roughness = 1.0f
+    };
+
+    private static StandardMaterial3D TexturedTopMaterial(Texture2D texture) => new()
+    {
+        ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
+        AlbedoTexture = texture,
+        TextureFilter = BaseMaterial3D.TextureFilterEnum.Nearest,
         Roughness = 1.0f
     };
 }

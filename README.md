@@ -29,7 +29,9 @@ The project targets .NET 8, which is supported by Godot 4.6 .NET.
 
 ## Pixel-art assets and rendering
 
-The unit's four 16×24 directional frames, the tree, and the crate are generated at startup by `Scripts/Rendering/PrototypeTextures.cs` using Godot `Image` and `ImageTexture`. There are no downloaded or missing asset files. Every `Sprite3D` uses nearest-neighbor filtering, unshaded rendering, alpha cutout, and a camera-facing billboard.
+The fighter, scout, and mage each use four transparent 40×48 directional frames under `Assets/PixelArt/Units`. Grass, dirt, and rock use 32×32 textures under `Assets/PixelArt/Terrain`. The larger generated source sheets are retained under `Assets/PixelArt/Source`, and `Tools/process_generated_art.py` reproducibly crops and normalizes them.
+
+Terrain still uses real 3D box geometry: a darker material covers the cube body and a separate unshaded plane places crisp pixel art only on the top face. Every unit `Sprite3D` uses nearest-neighbor filtering, unshaded rendering, alpha cutout, and a camera-facing billboard. The tree and crate remain small procedural pixel textures.
 
 The internal viewport is 320×180 and the default window is 1280×720. Integer scaling and nearest texture filtering keep the low-resolution presentation crisp.
 
@@ -37,4 +39,4 @@ The internal viewport is 320×180 and the default window is 1280×720. Integer s
 
 The camera pivot starts over the center of the 10×10 board at a 45-degree isometric yaw. Q/E changes only the view quadrant and tweens the pivot by exactly 90 degrees. Inputs received while that tween is active are ignored.
 
-A unit's `UnitState.Facing` always remains in world coordinates. `UnitVisual` selects the displayed frame with `(worldFacing - cameraQuadrant + 4) % 4`. During a smooth turn, the camera yaw is rounded to the nearest quadrant, so the texture switches once near the halfway point instead of rotating continuously. The Sprite3D remains billboarded only to keep its plane readable.
+A unit's `UnitState.Facing` always remains in world coordinates. The sprite filenames are view-relative: north is the back view, east/west are the two profiles, and south is the front view. `UnitVisual` selects the displayed frame with `(worldFacing - cameraQuadrant + 4) % 4`. Separate east and west artwork is used instead of mirroring, so asymmetrical weapons and clothing stay on the correct side. During a smooth turn, the camera yaw is rounded to the nearest quadrant, so the texture switches once near the halfway point instead of rotating continuously. The Sprite3D remains billboarded only to keep its plane readable.

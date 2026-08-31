@@ -58,17 +58,17 @@ public partial class Battle : Node3D
 
     private void BuildUnits(Node3D parent)
     {
-        AddUnit(parent, new UnitState("Amber", new Vector2I(3, 6), FacingDirection.North), new Color("d75c4d"));
-        AddUnit(parent, new UnitState("Teal", new Vector2I(6, 3), FacingDirection.East), new Color("3aa6a0"));
-        AddUnit(parent, new UnitState("Violet", new Vector2I(7, 7), FacingDirection.West), new Color("9567c6"));
+        AddUnit(parent, new UnitState("Amber", new Vector2I(3, 6), FacingDirection.North), UnitAppearance.Fighter);
+        AddUnit(parent, new UnitState("Teal", new Vector2I(6, 3), FacingDirection.East), UnitAppearance.Scout);
+        AddUnit(parent, new UnitState("Violet", new Vector2I(7, 7), FacingDirection.West), UnitAppearance.Mage);
     }
 
-    private void AddUnit(Node3D parent, UnitState state, Color color)
+    private void AddUnit(Node3D parent, UnitState state, UnitAppearance appearance)
     {
         _map.AddUnit(state);
         var unit = new TacticalUnit();
         parent.AddChild(unit);
-        unit.Build(state, _map, color);
+        unit.Build(state, _map, appearance);
         _units.Add(unit);
     }
 
