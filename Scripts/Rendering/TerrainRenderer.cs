@@ -7,8 +7,10 @@ namespace IsometricTestAI.Rendering;
 
 public partial class TerrainRenderer : GridMap
 {
-    private const float TileWidth = 0.96f;
-    private const float TopWidth = 0.92f;
+    // Fill the GridMap cell exactly. Smaller faces leave real gaps that expose
+    // internal walls while the camera rotates, making the board flicker apart.
+    private const float TileWidth = 1.0f;
+    private const float TopWidth = TileWidth;
     private const float BaseY = -0.34f;
 
     private readonly Dictionary<TerrainType, Material> _sideMaterials = new();
@@ -161,7 +163,9 @@ public partial class TerrainRenderer : GridMap
         ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
         AlbedoTexture = texture,
         TextureFilter = BaseMaterial3D.TextureFilterEnum.Nearest,
-        CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+        // Terrain is a closed shell viewed from the outside. Rendering back faces
+        // makes internal faces visible through sub-pixel seams during rotation.
+        CullMode = BaseMaterial3D.CullModeEnum.Back,
         Roughness = 1.0f
     };
 }

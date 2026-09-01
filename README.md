@@ -32,7 +32,7 @@ The project targets .NET 8, which is supported by Godot 4.6 .NET.
 
 The fighter, scout, and mage each use four transparent 40×48 directional frames under `Assets/PixelArt/Units`. Grass, dirt, and rock each use separate 32×32 top and side textures under `Assets/PixelArt/Terrain`. The larger generated source sheets are retained under `Assets/PixelArt/Source`, and `Tools/process_generated_art.py` reproducibly crops and normalizes them.
 
-Terrain still uses real 3D geometry, but the cells are batched by a `GridMap` rather than represented by individual scene nodes. Each mesh-library item uses a darker, material-specific side surface and a separate top surface for the corresponding top texture. Every unit `Sprite3D` uses nearest-neighbor filtering, unshaded rendering, alpha cutout, and a camera-facing billboard. The tree and crate remain small procedural pixel textures.
+Terrain still uses real 3D geometry, but the cells are batched by a `GridMap` rather than represented by individual scene nodes. Each mesh-library item fills its grid cell exactly, uses back-face culling so internal walls cannot flash into view, and has a darker, material-specific side surface plus a separate top surface for the corresponding top texture. Every unit `Sprite3D` uses nearest-neighbor filtering, unshaded rendering, alpha cutout, and a camera-facing billboard. The tree and crate remain small procedural pixel textures.
 
 The internal viewport is 320×180 and the default window is 1280×720. Integer scaling and nearest texture filtering keep the low-resolution presentation crisp.
 
