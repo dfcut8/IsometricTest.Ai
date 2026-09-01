@@ -7,4 +7,5 @@ public sealed class MapCell
     public Vector2I Position { get; set; }
     public TerrainType Terrain { get; set; }
     public int Elevation { get; set; }
+    public bool IsWalkable { get; set; } = true;
 }
