@@ -93,7 +93,7 @@ def process_units(source: Path, output: Path) -> None:
             frame.save(output / f"{unit_name}_{facing_name}.png", optimize=True)
 
 
-def process_terrain(source: Path, output: Path) -> None:
+def process_terrain(source: Path, output: Path, face: str) -> None:
     atlas = Image.open(source).convert("RGB")
     output.mkdir(parents=True, exist_ok=True)
 
@@ -102,10 +102,12 @@ def process_terrain(source: Path, output: Path) -> None:
         texture = atlas.crop((left, 0, right, atlas.height))
         side = min(texture.size)
         x = (texture.width - side) // 2
-        y = (texture.height - side) // 2
+        # Side atlases keep material transitions (such as the grass turf lip)
+        # along their top edge, while top-face art is safest center-cropped.
+        y = 0 if face == "side" else (texture.height - side) // 2
         texture = texture.crop((x, y, x + side, y + side))
         texture = texture.resize((32, 32), Image.Resampling.NEAREST)
-        texture.save(output / f"{terrain_name}_top.png", optimize=True)
+        texture.save(output / f"{terrain_name}_{face}.png", optimize=True)
 
 
 def main() -> None:
@@ -113,10 +115,13 @@ def main() -> None:
     parser.add_argument("unit_source", type=Path)
     parser.add_argument("terrain_source", type=Path)
     parser.add_argument("asset_root", type=Path)
+    parser.add_argument("--terrain-side-source", type=Path)
     args = parser.parse_args()
 
     process_units(args.unit_source, args.asset_root / "Units")
-    process_terrain(args.terrain_source, args.asset_root / "Terrain")
+    process_terrain(args.terrain_source, args.asset_root / "Terrain", "top")
+    if args.terrain_side_source is not None:
+        process_terrain(args.terrain_side_source, args.asset_root / "Terrain", "side")
 
 
 if __name__ == "__main__":
