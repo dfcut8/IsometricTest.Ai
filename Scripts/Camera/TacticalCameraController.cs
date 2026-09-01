@@ -1,5 +1,5 @@
-using System;
 using Godot;
+using System;
 
 namespace IsometricTestAI.Camera;
 
@@ -25,7 +25,7 @@ public partial class TacticalCameraController : Node3D
         {
             Name = "Camera3D",
             Projection = Camera3D.ProjectionType.Orthogonal,
-            Size = 14.2f,
+            Size = 4.2f,
             Position = new Vector3(0, 10.5f, 14.5f),
             RotationDegrees = new Vector3(-36, 0, 0),
             Current = true,
@@ -49,7 +49,7 @@ public partial class TacticalCameraController : Node3D
         CameraQuadrant = (CameraQuadrant + direction + 4) % 4;
         _targetYawDegrees += direction * 90.0f;
         _rotationTween = CreateTween().SetEase(Tween.EaseType.InOut).SetTrans(Tween.TransitionType.Cubic);
-        _rotationTween.TweenProperty(this, "rotation:y", Mathf.DegToRad(_targetYawDegrees), 0.3);
+        _rotationTween.TweenProperty(this, "rotation:y", Mathf.DegToRad(_targetYawDegrees), 1.3);
         _rotationTween.Finished += () =>
         {
             RotationDegrees = new Vector3(0, _targetYawDegrees, 0);
