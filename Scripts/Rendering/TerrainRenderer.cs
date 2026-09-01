@@ -19,6 +19,9 @@ public partial class TerrainRenderer : GridMap
     {
         Name = "Terrain";
         CellSize = new Vector3(1.0f, TacticalMap.ElevationStep, 1.0f);
+        // GridMap centers each item within its cell. Shift the whole grid back by
+        // half a cell so logical coordinates remain the world-space tile centers.
+        Position = -CellSize * 0.5f;
         CollisionLayer = 1;
         CollisionMask = 0;
 
