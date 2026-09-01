@@ -14,6 +14,7 @@ The project targets .NET 8, which is supported by Godot 4.6 .NET.
 
 - **Q** — rotate the camera left by 90 degrees.
 - **E** — rotate the camera right by 90 degrees.
+- **Mouse wheel** — smoothly zoom the camera in or out.
 - **Mouse move** — highlight the terrain cell under the pointer.
 - **Left click a unit** — select it and show its logical coordinate/facing.
 - **Left click an empty tile** — move the selected unit directly to that cell.
@@ -37,6 +38,6 @@ The internal viewport is 320×180 and the default window is 1280×720. Integer s
 
 ## Rotation and directional frames
 
-The camera pivot starts over the center of the 10×10 board at a 45-degree isometric yaw. Q/E changes only the view quadrant and tweens the pivot by exactly 90 degrees. Inputs received while that tween is active are ignored.
+The camera pivot starts over the center of the 10×10 board at a 45-degree isometric yaw. Q/E changes only the view quadrant and tweens the pivot by exactly 90 degrees. Inputs received while that tween is active are ignored. The mouse wheel smoothly changes the orthographic camera size, clamped to keep the view useful.
 
 A unit's `UnitState.Facing` always remains in world coordinates. The sprite filenames are view-relative: north is the back view, east/west are the two profiles, and south is the front view. `UnitVisual` selects the displayed frame with `(worldFacing - cameraQuadrant + 4) % 4`. Separate east and west artwork is used instead of mirroring, so asymmetrical weapons and clothing stay on the correct side. During a smooth turn, the camera yaw is rounded to the nearest quadrant, so the texture switches once near the halfway point instead of rotating continuously. The Sprite3D remains billboarded only to keep its plane readable.

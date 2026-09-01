@@ -129,7 +129,7 @@ public partial class Battle : Node3D
         {
             Color = new Color(0.035f, 0.05f, 0.08f, 0.78f),
             Position = new Vector2(6, 6),
-            Size = new Vector2(126, 72),
+            Size = new Vector2(126, 82),
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
         ui.AddChild(panel);
@@ -141,6 +141,7 @@ public partial class Battle : Node3D
         };
         ui.AddChild(box);
         box.AddChild(MakeLabel("Q / E - Rotate Camera", new Color("ffe36e")));
+        box.AddChild(MakeLabel("Mouse Wheel - Zoom", new Color("ffe36e")));
         _cameraLabel = MakeLabel("Camera: 0°", Colors.White);
         _hoverLabel = MakeLabel("Hovered Cell: --", Colors.White);
         _selectionLabel = MakeLabel("Selected Unit: none", Colors.White);

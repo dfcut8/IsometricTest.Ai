@@ -36,6 +36,23 @@ public partial class BattleInputController : Node
 
     public override void _UnhandledInput(InputEvent inputEvent)
     {
+        if (inputEvent is InputEventMouseButton { Pressed: true } mouseButton)
+        {
+            if (mouseButton.ButtonIndex == MouseButton.WheelUp)
+            {
+                _cameraController.ZoomIn(mouseButton.Factor);
+                GetViewport().SetInputAsHandled();
+                return;
+            }
+
+            if (mouseButton.ButtonIndex == MouseButton.WheelDown)
+            {
+                _cameraController.ZoomOut(mouseButton.Factor);
+                GetViewport().SetInputAsHandled();
+                return;
+            }
+        }
+
         if (inputEvent is InputEventKey key && key.Pressed && !key.Echo)
         {
             if (key.Keycode == Key.Q)
