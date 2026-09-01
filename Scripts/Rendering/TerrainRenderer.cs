@@ -12,12 +12,12 @@ public partial class TerrainRenderer : Node3D
     public void Build(TacticalMap map)
     {
         Name = "Terrain";
-        _sideMaterials[TerrainType.Grass] = FlatMaterial(new Color("3f5934"));
-        _sideMaterials[TerrainType.Dirt] = FlatMaterial(new Color("76502f"));
-        _sideMaterials[TerrainType.Rock] = FlatMaterial(new Color("4a5550"));
 
         foreach (TerrainType terrain in System.Enum.GetValues(typeof(TerrainType)))
-            _topMaterials[terrain] = TexturedTopMaterial(PrototypeTextures.LoadTerrainTop(terrain));
+        {
+            _sideMaterials[terrain] = TexturedMaterial(PrototypeTextures.LoadTerrainSide(terrain));
+            _topMaterials[terrain] = TexturedMaterial(PrototypeTextures.LoadTerrainTop(terrain));
+        }
 
         for (var x = 0; x < TacticalMap.Width; x++)
         for (var y = 0; y < TacticalMap.Height; y++)
@@ -46,6 +46,10 @@ public partial class TerrainRenderer : Node3D
             Mesh = new BoxMesh { Size = size },
             MaterialOverride = _sideMaterials[cell.Terrain]
         });
+        AddSideFace(body, "SideNorth", new Vector3(0, 0, -size.Z * 0.5f - 0.001f), 180, size, cell.Terrain);
+        AddSideFace(body, "SideEast", new Vector3(size.X * 0.5f + 0.001f, 0, 0), 90, size, cell.Terrain);
+        AddSideFace(body, "SideSouth", new Vector3(0, 0, size.Z * 0.5f + 0.001f), 0, size, cell.Terrain);
+        AddSideFace(body, "SideWest", new Vector3(-size.X * 0.5f - 0.001f, 0, 0), -90, size, cell.Terrain);
         body.AddChild(new MeshInstance3D
         {
             Name = "TexturedTop",
@@ -61,18 +65,30 @@ public partial class TerrainRenderer : Node3D
         });
     }
 
-    private static StandardMaterial3D FlatMaterial(Color color) => new()
+    private void AddSideFace(
+        Node3D body,
+        string name,
+        Vector3 position,
+        float rotationY,
+        Vector3 tileSize,
+        TerrainType terrain)
     {
-        ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
-        AlbedoColor = color,
-        Roughness = 1.0f
-    };
+        body.AddChild(new MeshInstance3D
+        {
+            Name = name,
+            Mesh = new QuadMesh { Size = new Vector2(tileSize.X, tileSize.Y) },
+            MaterialOverride = _sideMaterials[terrain],
+            Position = position,
+            RotationDegrees = new Vector3(0, rotationY, 0)
+        });
+    }
 
-    private static StandardMaterial3D TexturedTopMaterial(Texture2D texture) => new()
+    private static StandardMaterial3D TexturedMaterial(Texture2D texture) => new()
     {
         ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
         AlbedoTexture = texture,
         TextureFilter = BaseMaterial3D.TextureFilterEnum.Nearest,
+        CullMode = BaseMaterial3D.CullModeEnum.Disabled,
         Roughness = 1.0f
     };
 }

@@ -25,6 +25,16 @@ public static class PrototypeTextures
 
     public static Texture2D LoadTerrainTop(TerrainType terrain)
     {
+        return LoadTerrainTexture(terrain, "top");
+    }
+
+    public static Texture2D LoadTerrainSide(TerrainType terrain)
+    {
+        return LoadTerrainTexture(terrain, "side");
+    }
+
+    private static Texture2D LoadTerrainTexture(TerrainType terrain, string face)
+    {
         var terrainName = terrain switch
         {
             TerrainType.Grass => "grass",
@@ -32,7 +42,7 @@ public static class PrototypeTextures
             TerrainType.Rock => "rock",
             _ => throw new ArgumentOutOfRangeException(nameof(terrain), terrain, null)
         };
-        return GD.Load<Texture2D>($"res://Assets/PixelArt/Terrain/{terrainName}_top.png");
+        return GD.Load<Texture2D>($"res://Assets/PixelArt/Terrain/{terrainName}_{face}.png");
     }
 
     public static Texture2D CreateTree()

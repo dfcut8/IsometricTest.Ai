@@ -32,6 +32,20 @@ Constraints: opaque artwork; no gutters, borders, labels, grid overlay, objects,
 Avoid: painterly rendering, photorealism, gradients, blur, antialiasing, 3D perspective, isometric diamonds, UI elements, copied map layouts.
 ```
 
+## Terrain side atlas
+
+```text
+Use case: stylized-concept
+Asset type: production game texture atlas for the vertical side faces of 3D cube terrain tiles in a Godot isometric tactics prototype
+Input images: Image 1 is the existing top-face terrain atlas and is a strict style, palette, pixel density, and material reference. Create a new matching side-face atlas; do not modify or reproduce it as top-down art.
+Primary request: Create one original pixel-art atlas with exactly three equal square, straight-on orthographic seamless terrain side textures.
+Subject: Column 1 is the vertical cut side of a grassy tile: a thin mossy green turf lip along the entire top edge and dark earthy soil below with sparse tiny root and pebble pixel clusters. Column 2 is warm ochre packed earth seen from the side, with restrained horizontal compacted strata and sparse embedded pebble pixels. Column 3 is a cool gray-green weathered stone retaining face made of irregular fitted blocks with subtle dark seams and tiny moss accents.
+Style/medium: authentic crisp 16-bit-era Japanese tactical RPG environmental pixel art, matching Image 1's hand-placed square pixels, limited harmonious earthy palette, clustered dithering, no antialiasing, no smoothing. Slightly darker overall than the corresponding top textures so cube depth remains readable.
+Composition/framing: exact 3-column by 1-row atlas; all three cells equal square size; each texture fills its cell edge-to-edge; surfaces viewed perfectly straight-on with no perspective; horizontally seamless/tileable within each cell. Keep each material visually distinct at small 32x32 output size.
+Constraints: opaque artwork; perfectly clean cell boundaries; no gutters, borders, labels, grid overlay, isolated objects, plants, cast shadows, directional lighting, text, logos, or watermark. Hard axis-aligned pixel edges.
+Avoid: painterly rendering, photorealism, gradients, blur, antialiasing, 3D perspective, isometric diamonds, UI elements, large focal objects, copied map layouts.
+```
+
 `Tools/process_generated_art.py` removes the generated unit sheet's baked checkerboard,
-crops each cell, normalizes the baselines, and reduces the sprites and terrain textures
-with nearest-neighbor sampling.
+crops each cell, normalizes the baselines, and reduces the sprites plus both terrain
+texture atlases with nearest-neighbor sampling.
