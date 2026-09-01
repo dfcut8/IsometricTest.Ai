@@ -131,9 +131,11 @@ public partial class TerrainRenderer : GridMap
         var half = TopWidth * 0.5f;
         var surface = new SurfaceTool();
         surface.Begin(Mesh.PrimitiveType.Triangles);
+        // Godot treats clockwise vertices as front-facing. Keep the top's front
+        // face pointing upward so it remains visible with back-face culling.
         AddQuad(surface,
-            new Vector3(-half, 0.003f, half), new Vector3(half, 0.003f, half),
-            new Vector3(half, 0.003f, -half), new Vector3(-half, 0.003f, -half));
+            new Vector3(-half, 0.003f, -half), new Vector3(half, 0.003f, -half),
+            new Vector3(half, 0.003f, half), new Vector3(-half, 0.003f, half));
         surface.Commit(mesh);
     }
 
