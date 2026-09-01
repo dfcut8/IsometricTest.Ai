@@ -61,6 +61,6 @@ public partial class UnitVisual : Node3D
         // Atlas directions are view-relative: North is the back view, East/West are
         // profiles, and South is the front. Rotate the observer, not the world state.
         var normalizedQuadrant = (cameraQuadrant % 4 + 4) % 4;
-        return (FacingDirection)(((int)worldFacing - normalizedQuadrant + 4) % 4);
+        return (FacingDirection)(((int)worldFacing + normalizedQuadrant) % 4);
     }
 }
