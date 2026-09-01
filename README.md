@@ -22,17 +22,17 @@ The project targets .NET 8, which is supported by Godot 4.6 .NET.
 ## Architecture
 
 - `Scripts/Map/` contains the authoritative `MapCell[,]`, elevations, terrain types, grid/world conversion, and logical unit occupancy. It never queries scene nodes or physics.
-- `Scripts/Rendering/` turns the logical map into box meshes/colliders and generates the tiny pixel textures.
+- `Scripts/Rendering/` turns the logical map into one `GridMap` backed by a procedural `MeshLibrary`, and generates the tiny pixel textures.
 - `Scripts/Units/` separates `UnitState` (grid coordinate and world-facing direction) from `TacticalUnit`/`UnitVisual` (3D representation).
 - `Scripts/Camera/` owns the orthographic camera and its smooth, non-overlapping 0.3-second quarter-turn tweens.
-- `Scripts/Input/` performs one camera raycast implementation for all view angles. Terrain colliders carry their immutable logical coordinate.
+- `Scripts/Input/` performs one camera raycast implementation for all view angles. Terrain hits are converted from the `GridMap`'s local position to the logical X/Z coordinate.
 - `Scripts/Battle.cs` assembles the intentionally small procedural scene into `World/Terrain`, `World/Objects`, `World/Units`, `CameraPivot/Camera3D`, and `UI`.
 
 ## Pixel-art assets and rendering
 
 The fighter, scout, and mage each use four transparent 40×48 directional frames under `Assets/PixelArt/Units`. Grass, dirt, and rock each use separate 32×32 top and side textures under `Assets/PixelArt/Terrain`. The larger generated source sheets are retained under `Assets/PixelArt/Source`, and `Tools/process_generated_art.py` reproducibly crops and normalizes them.
 
-Terrain still uses real 3D box geometry: each cube body uses a darker, material-specific side texture while a separate unshaded plane places the corresponding top texture on its upper face. Every unit `Sprite3D` uses nearest-neighbor filtering, unshaded rendering, alpha cutout, and a camera-facing billboard. The tree and crate remain small procedural pixel textures.
+Terrain still uses real 3D geometry, but the cells are batched by a `GridMap` rather than represented by individual scene nodes. Each mesh-library item uses a darker, material-specific side surface and a separate top surface for the corresponding top texture. Every unit `Sprite3D` uses nearest-neighbor filtering, unshaded rendering, alpha cutout, and a camera-facing billboard. The tree and crate remain small procedural pixel textures.
 
 The internal viewport is 320×180 and the default window is 1280×720. Integer scaling and nearest texture filtering keep the low-resolution presentation crisp.
 

@@ -2,6 +2,7 @@ using System;
 using Godot;
 using IsometricTestAI.Camera;
 using IsometricTestAI.Map;
+using IsometricTestAI.Rendering;
 using IsometricTestAI.Units;
 
 namespace IsometricTestAI.Input;
@@ -100,15 +101,18 @@ public partial class BattleInputController : Node
         return camera.GetWorld3D().DirectSpaceState.IntersectRay(query);
     }
 
-    private static Vector2I? CellFromHit(Godot.Collections.Dictionary hit)
+    private Vector2I? CellFromHit(Godot.Collections.Dictionary hit)
     {
         if (hit.Count == 0)
             return null;
         var collider = hit["collider"].AsGodotObject();
         if (collider is TacticalUnit unit)
             return unit.State.GridPosition;
-        if (collider is Node node && node.HasMeta("grid_position"))
-            return node.GetMeta("grid_position").AsVector2I();
+        if (collider is TerrainRenderer terrain)
+        {
+            var cell = terrain.CellFromWorldPosition(hit["position"].AsVector3());
+            return _map.IsInBounds(cell) ? cell : null;
+        }
         return null;
     }
 
