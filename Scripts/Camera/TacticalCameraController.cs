@@ -34,7 +34,9 @@ public partial class TacticalCameraController : Node3D
             Projection = Camera3D.ProjectionType.Orthogonal,
             Size = DefaultCameraSize,
             Position = new Vector3(0, 10.5f, 14.5f),
-            RotationDegrees = new Vector3(-36, 0, 0),
+            // A 30-degree pitch with the pivot's 45-degree yaw projects square
+            // ground tiles as exact 2:1 isometric diamonds.
+            RotationDegrees = new Vector3(-30, 0, 0),
             Current = true,
             Near = 0.1f,
             Far = 100.0f
