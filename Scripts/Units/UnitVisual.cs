@@ -10,6 +10,7 @@ public partial class UnitVisual : Node3D
     private Sprite3D _sprite = null!;
     private MeshInstance3D _selectionRing = null!;
     private FacingDirection _worldFacing;
+    private int _cameraQuadrant;
 
     public void Build(UnitAppearance appearance, FacingDirection worldFacing)
     {
@@ -51,8 +52,15 @@ public partial class UnitVisual : Node3D
 
     public void SetSelected(bool selected) => _selectionRing.Visible = selected;
 
+    public void SetWorldFacing(FacingDirection worldFacing)
+    {
+        _worldFacing = worldFacing;
+        SetCameraQuadrant(_cameraQuadrant);
+    }
+
     public void SetCameraQuadrant(int cameraQuadrant)
     {
+        _cameraQuadrant = cameraQuadrant;
         _sprite.Texture = _frames[GetViewRelativeFacing(_worldFacing, cameraQuadrant)];
     }
 

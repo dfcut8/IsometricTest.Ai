@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using IsometricTestAI.Camera;
 using IsometricTestAI.Map;
@@ -12,12 +13,14 @@ public partial class BattleInputController : Node
     public event Action<Vector2I?>? HoveredCellChanged;
     public event Action<Vector2I?>? SelectedCellChanged;
     public event Action<TacticalUnit?>? SelectedUnitChanged;
+    public event Action<IReadOnlyList<Vector2I>>? PathChanged;
 
     private TacticalMap _map = null!;
     private TacticalCameraController _cameraController = null!;
     private Vector2I? _hovered;
     private TacticalUnit? _selectedUnit;
     private Vector2I? _selectedCell;
+    private IReadOnlyList<Vector2I> _currentPath = Array.Empty<Vector2I>();
 
     public void Configure(TacticalMap map, TacticalCameraController cameraController)
     {
@@ -33,6 +36,7 @@ public partial class BattleInputController : Node
             return;
         _hovered = cell;
         HoveredCellChanged?.Invoke(_hovered);
+        RefreshPath();
     }
 
     public override void _UnhandledInput(InputEvent inputEvent)
@@ -65,6 +69,9 @@ public partial class BattleInputController : Node
         if (inputEvent is not InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true })
             return;
 
+        if (_selectedUnit?.IsMoving == true)
+            return;
+
         var hit = RaycastAtMouse();
         if (hit.Count == 0)
             return;
@@ -82,10 +89,14 @@ public partial class BattleInputController : Node
             return;
 
         SelectCell(cell);
-        if (_selectedUnit != null && _map.TryMoveUnit(_selectedUnit.State, cell))
+        if (_selectedUnit != null)
         {
-            _selectedUnit.AnimateToLogicalPosition();
-            SelectedUnitChanged?.Invoke(_selectedUnit);
+            _currentPath = _map.FindPath(_selectedUnit.State, cell);
+            if (_selectedUnit.MoveAlongPath(_currentPath))
+            {
+                _currentPath = Array.Empty<Vector2I>();
+                PathChanged?.Invoke(_currentPath);
+            }
         }
     }
 
@@ -120,15 +131,33 @@ public partial class BattleInputController : Node
     {
         if (_selectedUnit == unit)
             return;
+        if (_selectedUnit != null)
+            _selectedUnit.MovementCompleted -= OnMovementCompleted;
         _selectedUnit?.SetSelected(false);
         _selectedUnit = unit;
         _selectedUnit.SetSelected(true);
+        _selectedUnit.MovementCompleted += OnMovementCompleted;
         SelectedUnitChanged?.Invoke(_selectedUnit);
+        RefreshPath();
     }
 
     private void SelectCell(Vector2I cell)
     {
         _selectedCell = cell;
         SelectedCellChanged?.Invoke(_selectedCell);
+    }
+
+    private void RefreshPath()
+    {
+        _currentPath = _selectedUnit != null && !_selectedUnit.IsMoving && _hovered is { } destination
+            ? _map.FindPath(_selectedUnit.State, destination)
+            : Array.Empty<Vector2I>();
+        PathChanged?.Invoke(_currentPath);
+    }
+
+    private void OnMovementCompleted()
+    {
+        SelectedUnitChanged?.Invoke(_selectedUnit);
+        RefreshPath();
     }
 }

@@ -13,11 +13,14 @@ public partial class Battle : Node3D
     private TacticalMap _map = null!;
     private TacticalCameraController _cameraController = null!;
     private readonly List<TacticalUnit> _units = new();
+    private readonly List<MeshInstance3D> _pathMarkers = new();
     private MeshInstance3D _hoverMarker = null!;
     private MeshInstance3D _selectedMarker = null!;
+    private Node3D _pathMarkersRoot = null!;
     private Label _cameraLabel = null!;
     private Label _hoverLabel = null!;
     private Label _selectionLabel = null!;
+    private Label _pathLabel = null!;
 
     public override void _Ready()
     {
@@ -54,6 +57,7 @@ public partial class Battle : Node3D
         input.HoveredCellChanged += UpdateHover;
         input.SelectedCellChanged += UpdateSelectedCell;
         input.SelectedUnitChanged += UpdateSelectedUnit;
+        input.PathChanged += UpdatePath;
     }
 
     private void BuildUnits(Node3D parent)
@@ -82,6 +86,7 @@ public partial class Battle : Node3D
 
     private void AddObject(Node3D parent, string name, Vector2I cell, Texture2D texture, float pixelSize, float height)
     {
+        _map.SetWalkable(cell, false);
         parent.AddChild(new Sprite3D
         {
             Name = name,
@@ -98,8 +103,10 @@ public partial class Battle : Node3D
 
     private void BuildMarkers(Node3D parent)
     {
+        _pathMarkersRoot = new Node3D { Name = "MovementPath" };
         _hoverMarker = CreateMarker("HoverCell", new Color(1.0f, 1.0f, 0.55f, 0.36f), 0.91f);
         _selectedMarker = CreateMarker("SelectedCell", new Color(0.20f, 0.72f, 1.0f, 0.48f), 0.72f);
+        parent.AddChild(_pathMarkersRoot);
         parent.AddChild(_hoverMarker);
         parent.AddChild(_selectedMarker);
     }
@@ -129,7 +136,7 @@ public partial class Battle : Node3D
         {
             Color = new Color(0.035f, 0.05f, 0.08f, 0.78f),
             Position = new Vector2(6, 6),
-            Size = new Vector2(126, 82),
+            Size = new Vector2(150, 103),
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
         ui.AddChild(panel);
@@ -142,11 +149,14 @@ public partial class Battle : Node3D
         ui.AddChild(box);
         box.AddChild(MakeLabel("Q / E - Rotate Camera", new Color("ffe36e")));
         box.AddChild(MakeLabel("Mouse Wheel - Zoom", new Color("ffe36e")));
+        box.AddChild(MakeLabel("Click Unit / Tile - Move", new Color("ffe36e")));
         _cameraLabel = MakeLabel("Camera: 0°", Colors.White);
         _hoverLabel = MakeLabel("Hovered Cell: --", Colors.White);
+        _pathLabel = MakeLabel("Path: --", Colors.White);
         _selectionLabel = MakeLabel("Selected Unit: none", Colors.White);
         box.AddChild(_cameraLabel);
         box.AddChild(_hoverLabel);
+        box.AddChild(_pathLabel);
         box.AddChild(_selectionLabel);
     }
 
@@ -201,6 +211,30 @@ public partial class Battle : Node3D
         _selectionLabel.Text = unit == null
             ? "Selected Unit: none"
             : $"Selected Unit: {unit.State.Name}\nPosition: {unit.State.GridPosition.X},{unit.State.GridPosition.Y}  Facing: {unit.State.Facing}";
+    }
+
+    private void UpdatePath(IReadOnlyList<Vector2I> path)
+    {
+        var markerCount = Mathf.Max(0, path.Count - 1);
+        while (_pathMarkers.Count < markerCount)
+        {
+            var marker = CreateMarker(
+                $"PathCell{_pathMarkers.Count + 1}",
+                new Color(0.18f, 0.88f, 1.0f, 0.50f),
+                0.54f);
+            _pathMarkersRoot.AddChild(marker);
+            _pathMarkers.Add(marker);
+        }
+
+        for (var index = 0; index < _pathMarkers.Count; index++)
+        {
+            var visible = index < markerCount;
+            _pathMarkers[index].Visible = visible;
+            if (visible)
+                PositionMarker(_pathMarkers[index], path[index + 1], 0.052f);
+        }
+
+        _pathLabel.Text = path.Count > 0 ? $"Path: {markerCount} steps" : "Path: --";
     }
 
     private void PositionMarker(Node3D marker, Vector2I cell, float offset)

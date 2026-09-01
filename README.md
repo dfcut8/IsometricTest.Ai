@@ -15,13 +15,14 @@ The project targets .NET 8, which is supported by Godot 4.6 .NET.
 - **Q** — rotate the camera left by 90 degrees.
 - **E** — rotate the camera right by 90 degrees.
 - **Mouse wheel** — smoothly zoom the camera in or out.
-- **Mouse move** — highlight the terrain cell under the pointer.
+- **Mouse move** — highlight the terrain cell under the pointer and preview a route for the selected unit.
 - **Left click a unit** — select it and show its logical coordinate/facing.
-- **Left click an empty tile** — move the selected unit directly to that cell.
+- **Left click a reachable tile** — move the selected unit along the highlighted route, one cell at a time.
 
 ## Architecture
 
 - `Scripts/Map/` contains the authoritative `MapCell[,]`, elevations, terrain types, grid/world conversion, and logical unit occupancy. It never queries scene nodes or physics.
+- `TacticalMap.FindPath` uses A* with Manhattan distance, four-directional movement, occupied/blocked cells, and a maximum one-level elevation change per step.
 - `Scripts/Rendering/` turns the logical map into one `GridMap` backed by a procedural `MeshLibrary`, and generates the tiny pixel textures.
 - `Scripts/Units/` separates `UnitState` (grid coordinate and world-facing direction) from `TacticalUnit`/`UnitVisual` (3D representation).
 - `Scripts/Camera/` owns the orthographic camera and its smooth, non-overlapping 0.3-second quarter-turn tweens.
