@@ -11,11 +11,11 @@ public partial class UnitVisual : Node3D
     private MeshInstance3D _selectionRing = null!;
     private FacingDirection _worldFacing;
 
-    public void Build(Color bodyColor, FacingDirection worldFacing)
+    public void Build(UnitAppearance appearance, FacingDirection worldFacing)
     {
         _worldFacing = worldFacing;
         foreach (FacingDirection direction in System.Enum.GetValues(typeof(FacingDirection)))
-            _frames[direction] = PrototypeTextures.CreateUnit(direction, bodyColor);
+            _frames[direction] = PrototypeTextures.LoadUnit(appearance, direction);
 
         _sprite = new Sprite3D
         {
@@ -25,8 +25,8 @@ public partial class UnitVisual : Node3D
             Shaded = false,
             DoubleSided = true,
             AlphaCut = SpriteBase3D.AlphaCutMode.Discard,
-            PixelSize = 0.045f,
-            Position = new Vector3(0, 0.53f, 0)
+            PixelSize = 0.027f,
+            Position = new Vector3(0, 0.62f, 0)
         };
         AddChild(_sprite);
 
@@ -53,7 +53,14 @@ public partial class UnitVisual : Node3D
 
     public void SetCameraQuadrant(int cameraQuadrant)
     {
-        var relative = ((int)_worldFacing - cameraQuadrant + 4) % 4;
-        _sprite.Texture = _frames[(FacingDirection)relative];
+        _sprite.Texture = _frames[GetViewRelativeFacing(_worldFacing, cameraQuadrant)];
+    }
+
+    public static FacingDirection GetViewRelativeFacing(FacingDirection worldFacing, int cameraQuadrant)
+    {
+        // Atlas directions are view-relative: North is the back view, East/West are
+        // profiles, and South is the front. Rotate the observer, not the world state.
+        var normalizedQuadrant = (cameraQuadrant % 4 + 4) % 4;
+        return (FacingDirection)(((int)worldFacing - normalizedQuadrant + 4) % 4);
     }
 }

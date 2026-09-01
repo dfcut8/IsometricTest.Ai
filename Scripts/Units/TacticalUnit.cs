@@ -10,7 +10,7 @@ public partial class TacticalUnit : Area3D
     private UnitVisual _visual = null!;
     private Tween? _moveTween;
 
-    public void Build(UnitState state, TacticalMap map, Color bodyColor)
+    public void Build(UnitState state, TacticalMap map, UnitAppearance appearance)
     {
         State = state;
         _map = map;
@@ -21,7 +21,7 @@ public partial class TacticalUnit : Area3D
 
         _visual = new UnitVisual { Name = "Visual" };
         AddChild(_visual);
-        _visual.Build(bodyColor, state.Facing);
+        _visual.Build(appearance, state.Facing);
 
         var collider = new CollisionShape3D
         {
